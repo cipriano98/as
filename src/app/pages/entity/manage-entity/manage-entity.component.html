@@ -1,0 +1,140 @@
+<section *ngIf="!loading; else isLoading" class="d-flex flex-column gap-3 my-4 container-fluid">
+  <article>
+    <ng-container *ngIf="id; else isNew">
+      <div class="d-flex justify-content-between align-items-center">
+        <span>Editar Entidades</span>
+        <button mat-raised-button color="warn">Excluir</button>
+      </div>
+    </ng-container>
+
+    <ng-template #isNew>
+      <span>Adicionar Entidades</span>
+    </ng-template>
+  </article>
+
+  <article>
+    <form [formGroup]="form" class="d-flex flex-column container-fluid">
+      <div class="row d-flex flex-row flex-wrap">
+        <!-- <mat-form-field floatLabel="never" class="col-12">
+          <mat-label>Pesquisa</mat-label>
+          <button matPrefix mat-icon-button class="text-secondary">
+            <mat-icon>search</mat-icon>
+          </button>
+          <input type="search" matInput [formControl]="filter" />
+
+          <button *ngIf="filter.value" matSuffix mat-icon-button (click)="filter.reset('')">
+            <mat-icon color="primary">close</mat-icon>
+          </button>
+        </mat-form-field> -->
+        <mat-form-field floatLabel="never" class="col-12">
+          <mat-label>Pesquisa</mat-label>
+
+          <input type="search" matInput formControlName="filter" />
+        </mat-form-field>
+
+        <div class="col-12 col-md my-2">
+          <label class="form-label" for="name">{{ generateLabel('name') }}</label>
+          <input checkRequired id="name" formControlName="name" class="form-control" />
+        </div>
+
+        <div class="col-12 col-md my-2">
+          <label class="form-label" for="user_string_socialName">{{ generateLabel('user_string_socialName') }}</label>
+          <input
+            checkRequired
+            id="user_string_socialName"
+            formControlName="user_string_socialName"
+            class="form-control"
+          />
+        </div>
+      </div>
+
+      <div class="row d-flex flex-row flex-wrap">
+        <div class="col-12 col-md my-2">
+          <label class="form-label" for="username">{{ generateLabel('username') }}</label>
+          <input checkRequired id="username" formControlName="username" class="form-control" />
+        </div>
+
+        <div class="col-12 col-md my-2">
+          <label class="form-label" for="email">{{ generateLabel('email') }}</label>
+          <input checkRequired id="email" formControlName="email" class="form-control" />
+        </div>
+      </div>
+
+      <div class="row d-flex flex-row flex-wrap">
+        <div class="ms-3 form-check my-2">
+          <label class="form-check-label" for="user_boolean_isMaster">
+            {{ generateLabel('user_boolean_isMaster') }}
+          </label>
+          <input
+            checkRequired
+            type="checkbox"
+            id="user_boolean_isMaster"
+            formControlName="user_boolean_isMaster"
+            class="form-check-input"
+          />
+        </div>
+      </div>
+
+      <!-- <div *ngIf="id" class="row d-flex flex-row flex-wrap">
+        <fieldset class="col-12 col-md my-2">
+          <label class="form-label" for="investor">{{ generateLabel('investor') }}</label>
+          <fieldset class="input-group">
+            <input readonly id="investor" class="form-control" formControlName="investor" />
+            <button
+              *ngIf="user.Investor"
+              type="button"
+              (click)="unlink('investor')"
+              class="btn btn-outline-secondary"
+              title="Desvincular investidor do usuário"
+            >
+              <fa-icon [icon]="icons.faClose"></fa-icon>
+            </button>
+            <button
+              type="button"
+              (click)="openModalSelectInvestor()"
+              class="btn btn-outline-secondary"
+              title="Buscar investidores"
+            >
+              <fa-icon [icon]="icons.faSearch"></fa-icon>
+            </button>
+          </fieldset>
+        </fieldset>
+
+        <fieldset class="col-12 col-md my-2">
+          <label class="form-label" for="collaborator">{{ generateLabel('collaborator') }}</label>
+          <fieldset class="input-group">
+            <input readonly id="collaborator" class="form-control" formControlName="collaborator" />
+            <button
+              *ngIf="user.Collaborator"
+              type="button"
+              (click)="unlink('collaborator')"
+              class="btn btn-outline-secondary"
+              title="Desvincular colaborador do usuário"
+            >
+              <fa-icon [icon]="icons.faClose"></fa-icon>
+            </button>
+            <button
+              type="button"
+              (click)="openModalSelectCollaborator()"
+              class="btn btn-outline-secondary"
+              title="Buscar investidores"
+            >
+              <fa-icon [icon]="icons.faSearch"></fa-icon>
+            </button>
+          </fieldset>
+        </fieldset>
+      </div> -->
+
+      <div class="d-flex gap-3 justify-content-end mt-3">
+        <button type="submit" (click)="goToList()" class="btn btn-outline-secondary px-5">Cancelar</button>
+        <button type="submit" (click)="save()" class="btn btn-success px-5">Salvar</button>
+      </div>
+    </form>
+  </article>
+</section>
+
+<ng-template #isLoading>
+  <div class="d-flex justify-content-center align-items-center m-5">
+    <span class="spinner-border text-primary"></span>
+  </div>
+</ng-template>

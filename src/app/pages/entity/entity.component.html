@@ -1,0 +1,67 @@
+<section class="d-flex flex-column gap-3 my-4 container-fluid">
+  <article class="d-flex justify-content-between align-items-center">
+    <span class="fs-3">Entidades</span>
+
+    <button class="col-2" mat-raised-button color="primary" (click)="addNew()" title="Nova Entidade">
+      <span class="d-none d-md-block">Nova Entidade</span>
+    </button>
+  </article>
+
+  <article class="card p-3">
+    <fieldset [disabled]="loading">
+      <mat-form-field floatLabel="never" class="col-12">
+        <mat-label>Pesquisa</mat-label>
+        <button matPrefix mat-icon-button class="text-secondary">
+          <mat-icon>search</mat-icon>
+        </button>
+        <input type="search" matInput [formControl]="filter" />
+
+        <button *ngIf="filter.value" matSuffix mat-icon-button (click)="filter.reset('')">
+          <mat-icon color="primary">close</mat-icon>
+        </button>
+      </mat-form-field>
+    </fieldset>
+
+    <table class="table table-striped table-hover">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Região</th>
+          <th>Especialidades</th>
+          <th>Ativa</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngIf="!(list$ | async)!.length" class="justify-content-center">
+          <td colspan="5">
+            <div class="d-flex justify-content-center">
+              <ng-container *ngIf="loading; else notFound">Carregando...</ng-container>
+              <ng-template #notFound>Não foram encontrados resultados</ng-template>
+            </div>
+          </td>
+        </tr>
+
+        <tr *ngFor="let entity of list$ | async; index as index">
+          <td>{{ entity.corporateName }}</td>
+          <td>{{ entity.region }}</td>
+          <td>{{ entity.medicalSpecialties.toString() }}</td>
+          <td>{{ entity.active }}</td>
+
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <button (click)="view(entity.id!)" mat-icon-button class="text-secondary" title="Visualizar">
+                <mat-icon>visibility</mat-icon>
+              </button>
+
+              <button (click)="edit(entity.id!)" mat-icon-button class="text-success" title="Editar">
+                <mat-icon>edit</mat-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </article>
+</section>
