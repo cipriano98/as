@@ -1,0 +1,31 @@
+<section class="d-flex justify-content-center align-items-center vh-100">
+  <article class="card col-11 col-sm-8 col-md-6 col-lg-4 shadow rounded-5">
+    <div class="px-3 pt-4">
+      <span>Login</span>
+    </div>
+
+    <fieldset [disabled]="loading" class="pb-5 pt-4 px-2 px-md-3">
+      <mat-error *ngIf="submitted && loginError">
+        Dados incorretos. Por Favor, revise seus dados e tente novamente.
+      </mat-error>
+
+      <form [formGroup]="userLogin" class="d-flex flex-column gap-3">
+        <mat-form-field floatLabel="never">
+          <mat-label>E-mail</mat-label>
+          <input type="email" matInput formControlName="email" />
+          <mat-error *ngIf="emailError">{{ emailError }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field floatLabel="never">
+          <mat-label>Senha</mat-label>
+          <input type="password" matInput formControlName="password" />
+          <mat-error *ngIf="passwordError">{{ passwordError }}</mat-error>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" [disabled]="loading" type="submit" (click)="authenticate()">
+          {{ loading ? 'Entrando...' : 'Entrar' }}
+        </button>
+      </form>
+    </fieldset>
+  </article>
+</section>

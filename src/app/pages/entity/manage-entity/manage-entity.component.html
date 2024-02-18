@@ -1,0 +1,92 @@
+<section *ngIf="!loading; else isLoading" class="d-flex flex-column gap-3 my-4 container-fluid">
+  <article>
+    <ng-container *ngIf="id; else isNew">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="fs-3">Criar Entidade</span>
+
+        <button mat-raised-button color="warn">Excluir</button>
+      </div>
+    </ng-container>
+
+    <ng-template #isNew>
+      <span class="fs-3">Adicionar Entidade</span>
+    </ng-template>
+  </article>
+
+  <article>
+    <form [formGroup]="form" class="d-flex flex-column container-fluid">
+      <fieldset class="row d-flex flex-row flex-wrap">
+        <mat-form-field class="col-12 col-md-6 my-2">
+          <mat-label>{{ generateLabel('corporateName') }}</mat-label>
+          <input matInput formControlName="corporateName" />
+
+          <mat-error *ngIf="formErrors">{{ formErrors['corporateName'] }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="col-12 col-md-6 my-2">
+          <mat-label>{{ generateLabel('tradeName') }}</mat-label>
+          <input matInput formControlName="tradeName" />
+
+          <mat-error *ngIf="formErrors">{{ formErrors['tradeName'] }}</mat-error>
+        </mat-form-field>
+      </fieldset>
+
+      <fieldset class="row d-flex flex-row flex-wrap">
+        <mat-form-field class="col-12 col-md-6 my-2">
+          <mat-label>{{ generateLabel('cnpj') }}</mat-label>
+          <input matInput formControlName="cnpj" />
+
+          <mat-error *ngIf="formErrors">{{ formErrors['cnpj'] }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="col-12 col-md-6 my-2">
+          <mat-label>{{ generateLabel('region') }}</mat-label>
+          <mat-select formControlName="region">
+            <mat-option *ngFor="let region of regions" [value]="region.value">
+              {{ region.label }}
+            </mat-option>
+          </mat-select>
+
+          <mat-error *ngIf="formErrors">{{ formErrors['region'] }}</mat-error>
+        </mat-form-field>
+      </fieldset>
+
+      <fieldset class="row d-flex flex-row flex-wrap">
+        <mat-form-field class="col-12 col-md-6 my-2">
+          <mat-label>{{ generateLabel('openingDate') }}</mat-label>
+          <input type="date" matInput formControlName="openingDate" />
+
+          <mat-error *ngIf="formErrors">{{ formErrors['openingDate'] }}</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="col-12 col-md-6 my-2">
+          <mat-label>{{ generateLabel('medicalSpecialties') }}</mat-label>
+          <mat-select formControlName="medicalSpecialties" multiple>
+            <mat-option *ngFor="let specialty of medicalSpecialties" [value]="specialty.value">
+              {{ specialty.label }}
+            </mat-option>
+          </mat-select>
+
+          <mat-error *ngIf="formErrors">{{ formErrors['medicalSpecialties'] }}</mat-error>
+        </mat-form-field>
+      </fieldset>
+
+      <fieldset>
+        <mat-checkbox color="primary" formControlName="active">{{ generateLabel('active') }}</mat-checkbox>
+      </fieldset>
+
+      <fieldset class="d-flex gap-3 justify-content-end mt-3">
+        <button type="button" (click)="goToList()" mat-raised-button class="px-5">Cancelar</button>
+        <button type="submit" (click)="save()" mat-raised-button class="px-5" color="primary">
+          {{ id ? 'Editar' : 'Salvar' }}
+        </button>
+      </fieldset>
+    </form>
+  </article>
+</section>
+
+<ng-template #isLoading>
+  <div class="d-flex justify-content-center align-items-center m-5">
+    <span class="spinner-border text-primary"></span>
+  </div>
+</ng-template>
