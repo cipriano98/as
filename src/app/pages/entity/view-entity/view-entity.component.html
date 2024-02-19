@@ -1,0 +1,60 @@
+<section class="d-flex flex-column gap-3 my-4 container">
+  <article class="d-flex justify-content-between align-items-center">
+    <span class="fs-3">Visualizar Clínica</span>
+
+    <button *ngIf="!loading" (click)="goToEdit()" mat-raised-button class="px-5" title="Clínica" color="primary">
+      Editar
+    </button>
+  </article>
+
+  <article *ngIf="!loading; else isLoading" class="d-flex flex-column">
+    <div class="row d-flex flex-row flex-wrap">
+      <div class="col-12 col-sm-6 col-md-4 my-4">
+        <mat-label class="fs-5">Nome Fantasia</mat-label>
+        <span class="d-block text-muted">{{ entity.tradeName }}</span>
+      </div>
+
+      <div class="col-12 col-sm-6 col-md-4 my-4">
+        <mat-label class="fs-5">Razão Social</mat-label>
+        <span class="d-block text-muted">{{ entity.corporateName }}</span>
+      </div>
+
+      <div class="col-12 col-sm-6 col-md-4 my-4">
+        <mat-label class="fs-5">CNPJ</mat-label>
+        <span class="d-block text-muted">{{ entity.cnpj | mask : '00.000.000/0000-00' }}</span>
+      </div>
+
+      <div class="col-12 col-sm-6 col-md-4 my-4">
+        <mat-label class="fs-5">Especialidades Médicas</mat-label>
+        <div *ngFor="let speciality of entity.medicalSpecialities; index as index">
+          <span class="d-block text-muted">{{ speciality }}</span>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-md-4 my-4">
+        <mat-label class="fs-5">Região</mat-label>
+        <span class="d-block text-muted">{{ entity.region }}</span>
+      </div>
+
+      <div class="col-12 col-sm-6 col-md-4 my-4">
+        <mat-label class="fs-5">Data de Inauguração</mat-label>
+        <span class="d-block text-muted">{{ entity.openingDate | date : 'dd/MM/yyyy' }}</span>
+      </div>
+
+      <div class="col-12 col-sm-6 col-md-4 mt-4 mb-3">
+        <mat-label class="fs-5">Ativa</mat-label>
+        <span class="d-block text-muted">{{ entity.active }}</span>
+      </div>
+    </div>
+  </article>
+
+  <article *ngIf="!loading" class="d-flex gap-3 justify-content-end mt-3">
+    <button (click)="goToList()" mat-raised-button class="px-5">Voltar</button>
+  </article>
+</section>
+
+<ng-template #isLoading>
+  <div class="d-flex justify-content-center align-items-center m-5">
+    <span class="spinner-border text-primary"></span>
+  </div>
+</ng-template>

@@ -8,11 +8,11 @@ import { MatInputModule } from '@angular/material/input'
 import { MatSelectModule } from '@angular/material/select'
 import { NgxMaskModule } from 'ngx-mask'
 import { ClinicService } from '../services/entity.service'
-import { ManageEntityRoutingModule } from './manage-entity-routing.module'
-import { ManageEntityComponent } from './manage-entity.component'
+import { ViewEntityRoutingModule } from './view-entity-routing.module'
+import { ViewEntityComponent } from './view-entity.component'
 
 @NgModule({
-  declarations: [ManageEntityComponent],
+  declarations: [ViewEntityComponent],
   imports: [
     CommonModule,
     NgxMaskModule.forRoot(),
@@ -22,8 +22,8 @@ import { ManageEntityComponent } from './manage-entity.component'
     MatInputModule,
     MatCheckboxModule,
     MatSelectModule,
-    ManageEntityRoutingModule
+    ViewEntityRoutingModule
   ],
   providers: [ClinicService]
 })
-export class ManageEntityModule {}
+export class ViewEntityModule {}

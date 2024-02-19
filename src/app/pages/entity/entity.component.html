@@ -1,67 +1,119 @@
-<section class="d-flex flex-column gap-3 my-4 container-fluid">
+<section class="d-flex flex-column gap-3 my-4">
   <article class="d-flex justify-content-between align-items-center">
-    <span class="fs-3">Entidades</span>
+    <span class="fs-3">Clínicas</span>
 
-    <button class="col-2" mat-raised-button color="primary" (click)="addNew()" title="Nova Entidade">
-      <span class="d-none d-md-block">Nova Entidade</span>
-    </button>
+    <button class="px-5" mat-raised-button color="primary" (click)="addNew()" title="Nova Clínica">Nova Clínica</button>
   </article>
 
-  <article class="card p-3">
-    <fieldset [disabled]="loading">
-      <mat-form-field floatLabel="never" class="col-12">
-        <mat-label>Pesquisa</mat-label>
-        <button matPrefix mat-icon-button class="text-secondary">
-          <mat-icon>search</mat-icon>
-        </button>
-        <input type="search" matInput [formControl]="filter" />
+  <article>
+    <mat-card class="mat-elevation-z8">
+      <fieldset [disabled]="loading" class="mb-2">
+        <mat-form-field floatLabel="never" class="col-12">
+          <mat-label>Pesquisa</mat-label>
+          <button matPrefix mat-icon-button class="text-secondary fs-5">
+            <mat-icon>search</mat-icon>
+          </button>
 
-        <button *ngIf="filter.value" matSuffix mat-icon-button (click)="filter.reset('')">
-          <mat-icon color="primary">close</mat-icon>
-        </button>
-      </mat-form-field>
-    </fieldset>
+          <input type="search" id="search" matInput [formControl]="search" />
 
-    <table class="table table-striped table-hover">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Região</th>
-          <th>Especialidades</th>
-          <th>Ativa</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
+          <mat-hint *ngIf="search.value">A busca é feita automaticamente quando tiver 3 carácteres ou mais</mat-hint>
 
-      <tbody>
-        <tr *ngIf="!(list$ | async)!.length" class="justify-content-center">
-          <td colspan="5">
-            <div class="d-flex justify-content-center">
-              <ng-container *ngIf="loading; else notFound">Carregando...</ng-container>
-              <ng-template #notFound>Não foram encontrados resultados</ng-template>
-            </div>
-          </td>
-        </tr>
+          <button *ngIf="search.value" matSuffix mat-icon-button (click)="search.reset('')" class="fs-5">
+            <mat-icon color="primary">close</mat-icon>
+          </button>
+        </mat-form-field>
+      </fieldset>
 
-        <tr *ngFor="let entity of list$ | async; index as index">
-          <td>{{ entity.corporateName }}</td>
-          <td>{{ entity.region }}</td>
-          <td>{{ entity.medicalSpecialties.toString() }}</td>
-          <td>{{ entity.active }}</td>
+      <div class="mattable table-responsive">
+        <ng-container *ngIf="clinicPagination?.data?.length; else elseTemplate">
+          <table
+            mat-table
+            [dataSource]="clinicPagination.data"
+            matSort
+            (matSortChange)="sort($event)"
+            [matSortActive]="paginationQuery.sort.active"
+            [matSortDirection]="paginationQuery.sort.direction"
+            class="mat-table-sticky mat-elevation-z3 w-100 h-100"
+          >
+            <!-- <table mat-table [dataSource]="clinicPagination.data" class="table table-striped table-hover w-100 h-100"> -->
+            <ng-container matColumnDef="corporateName">
+              <th class="px-2" mat-header-cell *matHeaderCellDef mat-sort-header>Nome</th>
+              <td class="px-2" mat-cell *matCellDef="let clinic">{{ clinic.corporateName }}</td>
+            </ng-container>
 
-          <td>
-            <div class="d-flex align-items-center gap-2">
-              <button (click)="view(entity.id!)" mat-icon-button class="text-secondary" title="Visualizar">
-                <mat-icon>visibility</mat-icon>
-              </button>
+            <ng-container matColumnDef="region">
+              <th class="px-2" mat-header-cell *matHeaderCellDef mat-sort-header>Região</th>
+              <td class="px-2" mat-cell *matCellDef="let clinic">{{ clinic.region }}</td>
+            </ng-container>
 
-              <button (click)="edit(entity.id!)" mat-icon-button class="text-success" title="Editar">
-                <mat-icon>edit</mat-icon>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            <ng-container matColumnDef="medicalSpecialities">
+              <th class="px-2" mat-header-cell *matHeaderCellDef>Especialidades</th>
+              <td class="px-2" mat-cell *matCellDef="let clinic">{{ clinic.medicalSpecialities }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="active">
+              <th class="px-2" mat-header-cell *matHeaderCellDef mat-sort-header>Ativa</th>
+              <td class="px-2" mat-cell *matCellDef="let clinic">{{ clinic.active }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th class="pe-5 ps-3" mat-header-cell *matHeaderCellDef>Ações</th>
+              <td class="px-2 w-auto" mat-cell *matCellDef="let clinic">
+                <button (click)="view(clinic.id!)" mat-icon-button class="text-secondary" title="Visualizar">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+
+                <button (click)="edit(clinic.id!)" mat-icon-button class="text-success" title="Editar">
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+
+          <mat-paginator
+            class="d-none d-md-block"
+            [pageSizeOptions]="[5, 10, 15]"
+            showFirstLastButtons
+            [pageIndex]="clinicPagination.page"
+            [pageSize]="clinicPagination.pageSize"
+            [length]="clinicPagination.totalItems"
+            (page)="changePage($event)"
+          >
+          </mat-paginator>
+        </ng-container>
+
+        <ng-template #elseTemplate>
+          <div
+            class="mattable d-flex flex-column justify-content-center align-items-center h-100 w-100"
+            *ngIf="!loading; else isLoading"
+          >
+            <span class="fs-5">☹</span>
+            <span>Não foram encontrados resultados</span>
+          </div>
+        </ng-template>
+      </div>
+
+      <div *ngIf="clinicPagination?.data?.length">
+        <mat-paginator
+          class="d-block d-md-none"
+          [pageSizeOptions]="[5, 10, 15]"
+          showFirstLastButtons
+          [pageIndex]="clinicPagination.page"
+          [pageSize]="clinicPagination.pageSize"
+          [length]="clinicPagination.totalItems"
+          (page)="changePage($event)"
+        >
+        </mat-paginator>
+      </div>
+    </mat-card>
   </article>
 </section>
+
+<ng-template #isLoading>
+  <div class="d-flex justify-content-center align-items-center m-5">
+    <span class="spinner-border text-primary"></span>
+  </div>
+</ng-template>

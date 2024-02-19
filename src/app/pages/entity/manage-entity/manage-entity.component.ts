@@ -1,8 +1,14 @@
 import { HttpErrorResponse } from '@angular/common/http'
 import { Component, OnInit } from '@angular/core'
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'
+import { MatSnackBar } from '@angular/material/snack-bar'
 import { ActivatedRoute, Router } from '@angular/router'
-import { EntityService } from '../service/entity.service'
+import { FormUtils } from 'src/app/shared/utils/form/form.utils'
+import { IMedicalSpeciality } from '../models/medical-speciality.model'
+import { IRegion } from '../models/region.model'
+import { ClinicService } from '../services/entity.service'
+import { MedicalSpecialityService } from '../services/medical-speciality.service'
+import { RegionService } from '../services/region.service'
 
 @Component({
   templateUrl: './manage-entity.component.html',
@@ -12,12 +18,20 @@ export class ManageEntityComponent implements OnInit {
   constructor(
     private readonly activatedRoute: ActivatedRoute,
     private readonly router: Router,
-    private readonly service: EntityService
+    private readonly snackBar: MatSnackBar,
+    private readonly regionService: RegionService,
+    private readonly medicalSpecialityService: MedicalSpecialityService,
+    private readonly service: ClinicService
   ) {}
 
   public readonly form: FormGroup = this.buildForm()
 
-  public loading = false
+  public regions: IRegion[] = []
+  public medicalSpecialities: IMedicalSpeciality[] = []
+  public loadingClinic = false
+  public loadingRegions = false
+  public loadingMedicalSpecialities = false
+  public submitted = false
   public id?: string
 
   ngOnInit(): void {
@@ -25,69 +39,151 @@ export class ManageEntityComponent implements OnInit {
       next: param => {
         const { id } = param
         id && this.findOne(id)
+        this.getMedicalSpecialities()
+        this.getRegions()
       }
     })
   }
 
   public save(): void {
+    this.submitted = true
+
     if (this.form.valid) {
-      const body = { ...this.form.value }
-      Reflect.deleteProperty(body, 'department')
-      Reflect.deleteProperty(body, 'office')
+      const { medicalSpecialities } = this.form.value
+
+      const body = {
+        ...this.form.value,
+        medicalSpecialities: medicalSpecialities.map((speciality: string) => {
+          return {
+            id: speciality
+          }
+        })
+      }
 
       const save = this.id
         ? this.service.update(this.id, body)
         : this.service.create(body)
 
-      this.loading = true
+      this.loadingClinic = true
       save.subscribe({
         next: data => {
-          alert(`Entidade ${data.id} salva com sucesso!`)
-          this.goToList()
-          this.loading = false
+          const action = this.id ? 'Editada' : 'Criada'
+          const message = `Clínica ${action} com sucesso`
+
+          this.snackBar.open(message, 'ok', {
+            duration: 3 * 1000
+          })
+
+          this.goToView(data.id!)
+          this.loadingClinic = false
         },
         error: (err: HttpErrorResponse) => {
-          alert(err.error.message)
-          this.loading = false
+          const error = 'Ocorreu um erro inesperado. Tente novamente mais tarde'
+
+          const message = err.error?.message ?? error
+
+          this.snackBar.open(message, 'ok', {
+            duration: 3 * 1000
+          })
+          this.loadingClinic = false
         }
       })
 
       return
     }
 
-    alert('Por favor, corrija os erros no formulário para continuar')
+    const message = 'Por favor, corrija os erros no formulário para continuar'
+    this.snackBar.open(message, 'ok', {
+      duration: 3 * 1000
+    })
+
     this.form.markAllAsTouched()
   }
 
   public goToList(): void {
-    this.router.navigate(['entity'])
+    this.router.navigate(['clinic'])
   }
 
-  public generateLabel(label: string): string {
-    const labels: { [key: string]: string } = {
-      corporateName: 'Razão Social',
-      tradeName: 'Nome Fantasia',
-      cnpj: 'CNPJ',
-      region: 'Região',
-      openingDate: 'Data de Inauguração ',
-      active: 'Gênero',
-      medicalSpecialties: 'DDI'
-    }
+  public goToView(id: string): void {
+    this.router.navigate(['clinic', id, 'view'])
+  }
 
-    return labels[label]
+  public remove(): void {
+    this.loadingClinic = true
+    this.service.remove(this.id!).subscribe({
+      next: () => {
+        this.loadingClinic = false
+        this.router.navigate(['clinic'])
+
+        const message = 'Clínica Removida com sucesso'
+        this.snackBar.open(message, 'ok', {
+          duration: 3000
+        })
+      },
+      error: (err: HttpErrorResponse) => {
+        const message = err.error?.message ?? 'Ocorreu um erro inesperado'
+
+        this.snackBar.open(message, 'ok', {
+          duration: 3000
+        })
+
+        this.loadingClinic = false
+      }
+    })
   }
 
   private findOne(id: string): void {
     this.id = id
-    this.loading = true
+    this.loadingClinic = true
     this.service.findOne(id).subscribe({
       next: data => {
         this.form.patchValue(data)
-        this.loading = false
+        this.loadingClinic = false
       },
       error: (err: HttpErrorResponse) => {
-        alert(err.error.massage)
-        this.loading = false
+        const message = err.error?.message ?? 'Ocorreu um erro inesperado'
+
+        this.snackBar.open(message, 'ok', {
+          duration: 3000
+        })
+        this.loadingClinic = false
+      }
+    })
+  }
+
+  private getMedicalSpecialities(): void {
+    this.loadingMedicalSpecialities = true
+
+    this.medicalSpecialityService.findAll().subscribe({
+      next: data => {
+        this.medicalSpecialities = data
+        this.loadingMedicalSpecialities = false
+      },
+      error: (err: HttpErrorResponse) => {
+        const message = err.error?.message ?? 'Ocorreu um erro inesperado'
+        this.loadingMedicalSpecialities = false
+
+        this.snackBar.open(message, 'ok', {
+          duration: 3000
+        })
+      }
+    })
+  }
+
+  private getRegions(): void {
+    this.loadingRegions = true
+    this.regionService.findAll().subscribe({
+      next: data => {
+        this.regions = data
+        this.loadingRegions = false
+      },
+      error: (err: HttpErrorResponse) => {
+        const message = err.error?.message ?? 'Ocorreu um erro inesperado'
+        this.loadingRegions = false
+
+        this.snackBar.open(message, 'ok', {
+          duration: 3000
+        })
       }
     })
   }
@@ -112,10 +208,24 @@ export class ManageEntityComponent implements OnInit {
       ],
       region: ['', [Validators.required]],
       openingDate: ['', [Validators.required]],
-      active: [false, [Validators.required]],
-      medicalSpecialties: [[], [Validators.required]]
+      active: [false],
+      medicalSpecialities: [[], [Validators.required, Validators.minLength(5)]]
     })
 
     return form
+  }
+
+  public get formErrors(): Record<string, string> | null {
+    if (!this.submitted) return null
+
+    return FormUtils.formValid(this.form)
+  }
+
+  public get loading(): boolean {
+    return (
+      this.loadingClinic &&
+      this.loadingRegions &&
+      this.loadingMedicalSpecialities
+    )
   }
 }

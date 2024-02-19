@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http'
-import { Component, OnInit } from '@angular/core'
+import { Component } from '@angular/core'
 import { FormBuilder, Validators } from '@angular/forms'
 import { LoginService } from './service/login.service'
 
@@ -7,20 +7,17 @@ import { LoginService } from './service/login.service'
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
   constructor(private readonly service: LoginService) {}
   public readonly userLogin = new FormBuilder().group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]]
   })
 
+  public passwordType = 'password'
   public loading = false
   public submitted = false
   public loginError = false
-
-  ngOnInit(): void {
-    this.isLoggedIn()
-  }
 
   public authenticate(): void {
     this.loginError = false
@@ -33,8 +30,10 @@ export class LoginComponent implements OnInit {
     this.loading = true
     this.service.authenticate(this.userLogin.value).subscribe({
       next: data => {
-        localStorage.setItem('user', JSON.stringify(data))
-        this.isLoggedIn()
+        localStorage.setItem('user', data.id)
+        localStorage.setItem('access_token', data.access_token)
+
+        location.href = ''
         this.loading = false
       },
       error: (err: HttpErrorResponse) => {
@@ -44,16 +43,8 @@ export class LoginComponent implements OnInit {
     })
   }
 
-  private isLoggedIn(): void {
-    const user = localStorage.getItem('user')
-
-    const goToHome = (): void => {
-      location.href = ''
-    }
-
-    const isLoggedIn = JSON.parse(user ?? '{}').access_token
-
-    isLoggedIn && goToHome()
+  public togglePassword(): void {
+    this.passwordType = this.passwordType === 'password' ? 'text' : 'password'
   }
 
   public get emailError(): string | null {

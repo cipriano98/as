@@ -1,5 +1,15 @@
 <section>
-  <article>
+  <article *ngIf="userManager$ | async as user">
+    <mat-toolbar color="primary" class="d-flex justify-content-between align-items-center">
+      <span class="fs-4">AmorSaúde</span>
+
+      <span>Bem Vindo, {{ user.name }}!</span>
+
+      <button (click)="logout()" class="btn btn-link text-white text-decoration-none">Sair</button>
+    </mat-toolbar>
+  </article>
+
+  <article class="container">
     <router-outlet></router-outlet>
   </article>
 </section>

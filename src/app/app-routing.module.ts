@@ -1,25 +1,28 @@
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
+import { AuthGuard } from './core/guards/auth.guard'
 
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'entity',
+    redirectTo: 'clinic',
     pathMatch: 'full'
   },
   {
-    path: 'entity',
+    path: 'clinic',
     loadChildren: () =>
-      import('./pages/entity/entity.module').then(m => m.EntityModule)
+      import('./pages/entity/entity.module').then(m => m.EntityModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'login',
     loadChildren: () =>
-      import('./pages/login/login.module').then(m => m.LoginModule)
+      import('./pages/login/login.module').then(m => m.LoginModule),
+    canActivate: [AuthGuard]
   },
   {
     path: '**',
-    redirectTo: 'entity',
+    redirectTo: 'clinic',
     pathMatch: 'full'
   }
 ]

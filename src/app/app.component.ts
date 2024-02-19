@@ -1,4 +1,5 @@
 import { Component } from '@angular/core'
+import { UserManagerService } from './shared/services/user-manager/user-manager.service'
 
 @Component({
   selector: 'as-root',
@@ -6,5 +7,12 @@ import { Component } from '@angular/core'
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'as'
+  constructor(private readonly userManager: UserManagerService) {}
+
+  public readonly userManager$ = this.userManager.userManager$
+
+  public logout(): void {
+    localStorage.clear()
+    location.reload()
+  }
 }

@@ -1,37 +1,25 @@
-export interface IEntity {
+import { IPagination } from 'src/app/shared/pagination/models/pagination.model'
+
+export interface IClinic {
   id?: string
   corporateName: string
   tradeName: string
   cnpj: string
   region: string
   openingDate: string
+  medicalSpecialities: string[]
   active: boolean
-  medicalSpecialties: string[]
 }
 
-export interface IEntityView {
+export interface IClinicView {
   id: string
+  openingDate: string
   corporateName: string
   region: string
-  medicalSpecialties: string[]
+  tradeName: string
+  cnpj: string
+  medicalSpecialities: string[]
   active: string
 }
 
-;[
-  { value: 'uuid', label: 'Alto tietê' },
-  { value: 'uuid', label: 'Interior' },
-  { value: 'uuid', label: 'ES' },
-  { value: 'uuid', label: 'SP Interior' },
-  { value: 'uuid', label: 'SP' },
-  { value: 'uuid', label: 'SP2' },
-  { value: 'uuid', label: 'MG' },
-  { value: 'uuid', label: 'Nacional' },
-  { value: 'uuid', label: 'SP CAV' },
-  { value: 'uuid', label: 'RJ' },
-  { value: 'uuid', label: 'SP2' },
-  { value: 'uuid', label: 'SP1' },
-  { value: 'uuid', label: 'NE1' },
-  { value: 'uuid', label: 'NE2' },
-  { value: 'uuid', label: 'SUL' },
-  { value: 'uuid', label: 'Norte' }
-]
+export type IClinicPagination = IPagination<IClinicView>
